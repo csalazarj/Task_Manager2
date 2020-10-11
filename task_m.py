@@ -18,27 +18,44 @@ def getProcess():
     for proc in processes_list:
         print(proc)
 
-    print('------------------------')
-    processes_list = []
+    print('---------------------------------------')
+
     
-def createProcess(name_proc):    
+def createProcess():
+    name_proc = str(input("Insert application's name to open: "))
     try:
         sp.Popen([name_proc])
+        print('\n----------------------------------')
+        print('Process spawned successfully')
+        print('----------------------------------\n')
+
     except:
+        print('\n----------------------------------')
         print('Application not found')
+        print('----------------------------------\n')
+
 
 def getWelcome():
     print('Welcome to TaskManager')
-    print('------------------------\n')
+    print('--------------------------------------\n')
 
-def spawnProcess():
-    app_name = str(input("Insert application's name to open\n>>"))
-    createProcess(app_name)
 
 def killProcess():
+    refreshConsole()
     PID = input('Write the PID of process to kill: ')
-    kill = sp.check_output(f"kill {PID}",shell=True)
-    print(f'Process {PID} deleted succesfully\n')
+    if PID in ["cancel","CANCEL","Cancel"]:
+        pass
+    else:
+        try:
+            kill = sp.check_output(f"sudo kill {PID}",shell=True)
+            print('\n----------------------------------')
+            print(f'Process {PID} deleted succesfully')
+            print('----------------------------------\n')
+        except:
+            print('\n----------------------------------')
+            print('Application not found')
+            print('----------------------------------\n')
+
 
 def refreshConsole():
     clear = sp.run("clear",shell=True)
@@ -53,17 +70,17 @@ def users():
     if "USER" in users_list:
         users_list.remove("USER")
 
-    print('------------------------\n')
+    print('---------------------------------------\n')
 
     for i in range(0,len(users_list)):
         user2 = users_list[i]
         print(f"- {user2}")
                 
-    print('------------------------\n')
+    print('---------------------------------------\n')
 
 def processUser():
     users()
-    selUser = input('Select the user \n')
+    selUser = input('Select the user: ')
 
     print('------------------------\n')
     showProcess = sp.run(f"ps -U {selUser} -u {selUser} -o pid,ppid,comm,user",shell=True)
@@ -72,13 +89,26 @@ def processUser():
 def countProcesses():
     n = sp.check_output("ps aux | wc -l",shell=True)
     n = n.decode('UTF-8')
+    print('------------------------\n')
     print(f'Number of processes: {n}')
+    print('------------------------\n')
+
 
 def child_sleep():
     x=sp.Popen("sleep 1000 &",shell=True)
     y=x.pid
-    print(f"the PID of the new child process is {y+1} \n")
+    print('\n----------------------------------------')
+    print(f"the PID of the new child process is {y+1}")
+    print('----------------------------------------\n')
 
+
+def createProcessUser():
+    users()
+    username=str(input("chosee the name of the user\n>>"))
+    procname=str(input("choose the name of the process to open\n>>"))
+    proc = sp.Popen(f"sudo -u {username} {procname}",shell=True)
+
+    
 def ask():
     res = ''
 
@@ -90,10 +120,12 @@ def ask():
         print('Press 5 to see the users')
         print('Press 6 to see the processes for each user')
         print('Press 7 to create a child process')
+        print('Press 8 to create process with any other user')
+
         res = input('To exit press "Q" \n>> ')
 
         if (res == '1'):
-            spawnProcess()
+            createProcess()
 
         elif (res == '2'):
             killProcess()
@@ -112,6 +144,9 @@ def ask():
 
         elif (res == '7'):
             child_sleep()
+
+        elif (res == '8'):
+            createProcessUser()
 
         elif (res == 'Q'):
             print('Good Bye!!')
